@@ -1,22 +1,30 @@
 import './App.css';
 import Calendar from './Calendar';
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-datepicker/dist/react-datepicker-cssmodules.css";
+import { db } from "./firebase-config"
+import { collection, getDoc, addDoc} from "firebase/firestore"
 
 function App() {
-  const [newEvent, setNewEvent] = useState({
-    title: "",
-    start: "",
-    end: "",
-    id: 1,
-  });
-  const [allEvents, setAllEvents] = useState(
-    JSON.parse(localStorage.getItem("events")) || []
-  );
-  const handleAddEvent = () => {
+  const [newEvent, setNewEvent] = useState({});
+  const [allEvents, setAllEvents] = useState([]);
+  
+  const handleAddEvent = async () => {
+    const event = {
+      title: newEvent.title,
+      start: newEvent.start,
+      end: newEvent.end,
+    };
+    try {
+      const docRef = await addDoc(collection(db, "events"), event);
+      console.log("Event added with ID: ", docRef.id);
+    } catch (error) {
+      console.error("Error adding event: ", error);
+    }
+    
     setAllEvents((prev) => {
       let ev = { ...newEvent };
 
@@ -27,11 +35,11 @@ function App() {
       console.log("prev", newEvent);
       return [...prev, ev];
     });
+
     setNewEvent({
       title: "",
       start: "",
       end: "",
-      id: 1,
     });
   };
   
