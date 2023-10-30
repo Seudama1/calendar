@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import './Calendar.css';
 
 const Calendar = () => {
+  // State variables for the current date and view type (day, week, or month)
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState('month');
-
+  // Logic to handle previous button click for different views (day, week, month)
   const handlePrev = () => {
     if (view === 'day') {
       setDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1));
@@ -14,7 +15,7 @@ const Calendar = () => {
       setDate(new Date(date.getFullYear(), date.getMonth() - 1, 1));
     }
   };
-
+  // Logic to handle next button click for different views (day, week, month)
   const handleNext = () => {
     if (view === 'day') {
       setDate(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1));
@@ -24,7 +25,8 @@ const Calendar = () => {
       setDate(new Date(date.getFullYear(), date.getMonth() + 1, 1));
     }
   };
-
+  //render days based on the current view type (day, week, month)
+  // Returns an array of React elements representing the calendar days
   const renderDays = () => {
     const days = [];
 
@@ -79,17 +81,21 @@ const Calendar = () => {
 
   return (
     <div className="calendar">
+        {/* View buttons to switch between day, week, and month */}
         <div className="view-buttons">
         <button onClick={() => setView('day')}>Day</button>
         <button onClick={() => setView('week')}>Week</button>
         <button onClick={() => setView('month')}>Month</button>
       </div>
+      {/* Header section with navigation buttons and current month/year display */}
       <div className="header">
         <button onClick={handlePrev}>&lt;</button>
         <h1>{date.toLocaleString('en-US', { month: 'long', year: 'numeric' })}</h1>
         <button onClick={handleNext}>&gt;</button>
       </div>
+      {/* Table to display the calendar days */}
       <table className="calendar-table">
+        {/* Table headers for days of the week (visible in week and month views) */}
         {view !== 'day' && (
           <thead>
             <tr>
@@ -103,6 +109,7 @@ const Calendar = () => {
             </tr>
           </thead>
         )}
+        {/* Table body containing rendered days */}
         <tbody>{renderDays()}</tbody>
       </table>
     </div>
