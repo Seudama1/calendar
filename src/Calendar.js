@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './Calendar.css';
+import { db } from "./firebase-config"
+import { collection, getDocs, addDoc} from "firebase/firestore"
 
-const Calendar = () => {
+const Calendar = ({events}) => {
   // State variables for the current date and view type (day, week, or month)
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState('month');
@@ -79,6 +81,30 @@ const Calendar = () => {
     return days;
   };
 
+  const renderEvents = () => {
+    return events.map((event) => {
+      const eventStart = new Date(event.start.toDate());
+      const eventEnd = new Date(event.end.toDate());
+  
+      const isEventVisible =
+        (view === 'day' && eventStart.toDateString() === date.toDateString()) ||
+        (view === 'week' &&
+          eventStart >= new Date(date.getFullYear(), date.getMonth(), date.getDate()) &&
+          eventEnd <= new Date(date.getFullYear(), date.getMonth(), date.getDate() + 7)) ||
+        (view === 'month' &&
+          eventStart >= new Date(date.getFullYear(), date.getMonth(), 1) &&
+          eventEnd <= new Date(date.getFullYear(), date.getMonth() + 1, 0));
+  
+      if (isEventVisible) {
+        return (
+          <div key={event.id} className="event">
+            {event.title}
+          </div>
+        );
+      }
+      return null;
+    });
+  };
   return (
     <div className="calendar">
         {/* View buttons to switch between day, week, and month */}
@@ -112,6 +138,9 @@ const Calendar = () => {
         {/* Table body containing rendered days */}
         <tbody>{renderDays()}</tbody>
       </table>
+      <div>
+        {renderEvents()}
+      </div>
     </div>
   );
 };

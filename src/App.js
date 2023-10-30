@@ -6,13 +6,14 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-datepicker/dist/react-datepicker-cssmodules.css";
 import { db } from "./firebase-config"
-import { collection, getDoc, addDoc} from "firebase/firestore"
+import { collection, getDocs, addDoc} from "firebase/firestore"
 
 function App() {
-  const [newEvent, setNewEvent] = useState({});
-  const [allEvents, setAllEvents] = useState([]);
-  
-  const handleAddEvent = async () => {
+  const [newEvent, setNewEvent] = useState({});//Represents the details of the new event to be added.
+  const [allEvents, setAllEvents] = useState([]);//Contains an array of all events.
+  const [events, setEvents] = useState([]); // State to store events fetched from Firestore
+
+  const handleAddEvent = async () => {// This function adds the new event to both Firestore and the local state 
     const event = {
       title: newEvent.title,
       start: newEvent.start,
@@ -42,13 +43,31 @@ function App() {
       end: "",
     });
   };
+
+  const fetchEventsFromFirestore = async () => {
+    const eventsCollectionRef = collection(db, 'events');
+    const querySnapshot = await getDocs(eventsCollectionRef);
+    const eventData = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setEvents(eventData);
+  };
+
+  useEffect(() => {
+    // Fetch events from Firestore when the component mounts
+    fetchEventsFromFirestore();
+  }, []);
+
+  useEffect(() => {//local storage attempt
+    localStorage.setItem("events", JSON.stringify(allEvents));
+  }, [allEvents]);
+
   
-  localStorage.setItem("events", JSON.stringify(allEvents));
- 
   return (
     <div className="App">
       <div className="title">C O O L E N D A R</div>
-      <Calendar />
+      <Calendar events={events} />
       <div className="form-contain">
           <input
             type="text"
