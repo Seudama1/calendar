@@ -138,7 +138,8 @@ const Calendar = ({events}) => {
         {/* Table body containing rendered days */}
         <tbody>{renderDays()}</tbody>
       </table>
-      <div>
+      <div className = "eventBox">
+        <div className='title'>EVENTS:</div>
         {renderEvents()}
       </div>
     </div>
